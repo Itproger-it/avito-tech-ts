@@ -136,8 +136,8 @@ func (pr *PrRepository) ReassignReviewer(prID string, oldUser string) (string, e
 	}
 
 	var teamAndAuthor struct {
-		team_name string `db:"team_name"`
-		author_id string `db:"author_id"`
+		TeamName string `json:"team_name" db:"team_name"`
+		UserId   string `json:"user_id" db:"user_id"`
 	}
 	err = pr.db.Get(&teamAndAuthor,
 		`SELECT tu.team_name, tu.user_id
@@ -161,7 +161,7 @@ func (pr *PrRepository) ReassignReviewer(prID string, oldUser string) (string, e
 		   AND u.user_id NOT IN (
 				SELECT user_id FROM PullRequestUsers WHERE pull_request_id=$3
 		   )`,
-		teamAndAuthor.team_name, oldUser, prID, teamAndAuthor.author_id,
+		teamAndAuthor.TeamName, oldUser, prID, teamAndAuthor.UserId,
 	)
 	if err != nil || len(candidates) == 0 {
 		return "", &errs.NoCandidateError{}
